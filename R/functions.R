@@ -335,7 +335,7 @@ shinyOdd<-function(nPotentialShinyCatched){
   functionName<-match.call()[[1]]
   step<-"Start"
   tryCatch({
-    if(is.nan(nPotentialShinyCatched) || is.na(nPotentialShinyCatched || nPotentialShinyCatched == 0)){
+    if(is.nan(nPotentialShinyCatched) | is.na(nPotentialShinyCatched) | nPotentialShinyCatched == 0){
       return(0)
     }
 
