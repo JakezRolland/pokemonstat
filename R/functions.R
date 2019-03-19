@@ -176,6 +176,8 @@ cleanPokemonHistory<-function(data){
   data = data[order(data$Level),]
 
 
+  data$isShinyCD<-rep(0,dim(data)[1])
+  data$isShiny<-rep(0,dim(data)[1])
 
   pokemonlist=data[1,];
   colnames(data)<-c("Ancestor","Scan.date","Nr","Name","Nickname","Gender" ,
@@ -344,8 +346,57 @@ shinyOdd<-function(nPotentialShinyCatched){
 }
 
 
+#' setIsShiny
+#'
+#' @param rowNumber row to change
+#' @param data history of capture
+#'
+#' @param value value to put
+#'
+#' @export
+#'
+#'
+setIsShiny<-function(rowNumber,data,value){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+    data[rowNumber,'isShiny'] <- value
+    saveHistory(data)
+}, error = function(err) onError(err,functionName,step ))
+}
 
 
+#' setIsShinyCD
+#'
+#' @param rowNumber row to change
+#' @param data history of capture
+#'
+#' @param value value to put
+#'
+#' @export
+#'
+#'
+setIsShinyCD<-function(rowNumber,data,value){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+    data[rowNumber,'isShinyCD'] <- value
+    saveHistory(data)
+  }, error = function(err) onError(err,functionName,step ))
+}
 
-
+#' saveHistory
+#'
+#' @param data history to save
+#'
+#' @export
+#'
+#'
+saveHistory<-function(data){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+   saveRDS(data);
+  }, error = function(err) onError(err,functionName,step ))
+}
 
