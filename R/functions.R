@@ -274,7 +274,6 @@ updateDatas<-function(){
   }, error = function(err) onError(err,functionName,step ))
 }
 
-reCompute
 
 #' getPokedex
 #' @export
