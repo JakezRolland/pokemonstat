@@ -54,8 +54,6 @@ installRPackages<-function(packages_to_install){
     if (FALSE %in% to_install){
       install.packages(packages_to_install[!to_install],dependencies=TRUE,repos='http://cran.us.r-project.org',lib=getLibPath())
     }
-    lapply(packages_to_install, require, character.only = TRUE, quietly=TRUE,lib.loc=getLibPath());
-
   }, error = function(err) onError(err,functionName,step ))
 }
 #' libraryPackages
