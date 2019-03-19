@@ -26,12 +26,12 @@ addShinyColumns<-function(data,pokedex){
 #' @export
 #'
 #'
-countShinyByDay<-function(data,day){
+ countShinyByDay<-function(data,day){
   functionName<-match.call()[[1]]
   step<-"Start"
   tryCatch({
   dataDay = data[data$scan.day==day,];
-  sums = sum(dataDay$shiny);
+  sums = sum(dataDay$shiny,na.rm = TRUE);
   return(sums);
   }, error = function(err) onError(err,functionName,step ))
 }
@@ -185,7 +185,7 @@ cleanPokemonHistory<-function(data){
                     , "Special.move",          "Sword"   ,          "Shield"   ,         "Eye"    ,           "Star"
                     ,  "Custom1"       ,    "Custom2"      ,     "Saved"        ,     "Form"        ,      "Egg"        ,       "Lucky"
   )
-  data$shiny <- pokedex$Shiny[data$Nr];
+  data$shiny <- pokedex$Shiny[match(data$Nr,pokedex$No)];
 
   #transforme les dates en string
   data$Scan.date<-as.character(data$Scan.date)
@@ -263,7 +263,6 @@ updateDatas<-function(){
 
   }
   if(dim(newdata)[1]>0){
-    newdata = cleanPokemonHistory(newdata)
     data = rbind(data,newdata)
   }
 
@@ -275,6 +274,7 @@ updateDatas<-function(){
   }, error = function(err) onError(err,functionName,step ))
 }
 
+reCompute
 
 #' getPokedex
 #' @export
@@ -342,6 +342,8 @@ shinyOdd<-function(nPotentialShinyCatched){
   return(round(sum(dbinom(x=1:nPotentialShinyCatched,size=nPotentialShinyCatched,prob=1/450))*100,2))
   }, error = function(err) onError(err,functionName,step ))
 }
+
+
 
 
 
