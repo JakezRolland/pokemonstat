@@ -9,8 +9,12 @@
 #'
 #'
 addShinyColumns<-function(data,pokedex){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   data$shiny = pokedex$Shiny[data$Nr];
   return(data)
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 #' countShinyByDay
@@ -23,9 +27,13 @@ addShinyColumns<-function(data,pokedex){
 #'
 #'
 countShinyByDay<-function(data,day){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   dataDay = data[data$scan.day==day,];
   sums = sum(dataDay$shiny);
   return(sums);
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 #' countCapturedByDay
@@ -38,9 +46,13 @@ countShinyByDay<-function(data,day){
 #'
 #'
 countCapturedByDay<-function(data,day){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   dataDay = data[data$scan.day==day,];
   sums = dim(dataDay)[1];
   return(sums);
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 #' countCapturedPokemonByDay
@@ -54,10 +66,14 @@ countCapturedByDay<-function(data,day){
 #'
 #'
 countCapturedPokemonByDay<-function(data,day,pokemonNr){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   dataDay = data[data$scan.day==day,];
   dataDay = dataDay[dataDay$Nr==pokemonNr,];
   sums = dim(dataDay)[1];
   return(sums);
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 
@@ -70,6 +86,9 @@ countCapturedPokemonByDay<-function(data,day,pokemonNr){
 #'
 #'
 summaryByDay<-function(data){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   minDay = min(data$scan.day);
   maxDay = max(data$scan.day)
   days =  seq(as.Date(minDay), as.Date(maxDay), by="days")
@@ -86,6 +105,7 @@ summaryByDay<-function(data){
   }
 
   return(data.frame(day=days,captured = captured,nShiny=sumShiny,ratioshiny = ratio,shinyOdd = shinyodds))
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 #' summaryPokemonByDay
@@ -94,6 +114,9 @@ summaryByDay<-function(data){
 #' @param pokemonNr number of pokemon
 #' @export
 summaryPokemonByDay<-function(data,pokemonNr){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   minDay = min(data$scan.day);
   maxDay = max(data$scan.day)
   days =  seq(as.Date(minDay), as.Date(maxDay), by="days")
@@ -109,6 +132,7 @@ summaryPokemonByDay<-function(data,pokemonNr){
   }
 
   return(data.frame(day=days,captured = captured,ratio = ratio))
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 
@@ -123,12 +147,16 @@ summaryPokemonByDay<-function(data,pokemonNr){
 #' @import ggplot2
 #'
 plotCapturePokemonByDay<-function(data,pokemonNr,pokedex){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   datas = summaryPokemonByDay(data,pokemonNr);
   day = datas$day;
   captured = datas$captured
   p<- ggplot(data=datas, aes(x=day, y=captured)) +
     geom_bar(stat="identity")+ggtitle(pokedex$Name[pokemonNr])
   return(p)
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 #' cleanPokemonHistory
@@ -138,6 +166,9 @@ plotCapturePokemonByDay<-function(data,pokemonNr,pokedex){
 #' @export
 
 cleanPokemonHistory<-function(data){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
 
   pokedex = getPokedex();
   data$DPS<-NULL
@@ -180,6 +211,7 @@ cleanPokemonHistory<-function(data){
 
 
   return(data);
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 
@@ -187,6 +219,9 @@ cleanPokemonHistory<-function(data){
 #' @export
 
 updateDatas<-function(){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
 
   if(file.exists("pokemonHistory.rds")){
     data = readRDS("pokemonHistory.rds")
@@ -237,6 +272,7 @@ updateDatas<-function(){
   saveRDS(filesLoaded,file=nameFilesLoaded)
 
   return(data)
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 
@@ -244,11 +280,15 @@ updateDatas<-function(){
 #' @export
 #' @import utils
 getPokedex <- function(){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   #pokedex <- read.csv2("~/Documents/pokedex.csv", header = TRUE, sep = ";", quote = "\"",
   # dec = ".", fill = TRUE,encoding="UTF-8")
   pokedex <- read.csv2("pokedex.csv", header = TRUE, sep = ";", quote = "\"",dec = ".", fill = TRUE,encoding="UTF-8")
   return(pokedex);
 
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 
@@ -263,6 +303,9 @@ getPokedex <- function(){
 #' @param data All history of pokemon
 #' @export
 getCaptureByDay<-function(day,data){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   data_day<-data[data$scan.day==day,]
   data_day_shiny = data_day[data_day$shiny==1,]
   captures = as.data.frame(table(data_day$Name))
@@ -278,6 +321,7 @@ getCaptureByDay<-function(day,data){
   shiny = sum(captureShiny$Freq)
   colnames(captures)<-c("Pokemon","Catched")
   return(list(captures=captures,total=total,shiny=shiny,ratio=shiny/total))
+  }, error = function(err) onError(err,functionName,step ))
 }
 
 
@@ -289,6 +333,14 @@ getCaptureByDay<-function(day,data){
 #' @export
 
 shinyOdd<-function(nPotentialShinyCatched){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
   return(round(sum(dbinom(x=1:nPotentialShinyCatched,size=nPotentialShinyCatched,prob=1/450))*100,2))
+  }, error = function(err) onError(err,functionName,step ))
 }
+
+
+
+
 
