@@ -336,6 +336,9 @@ shinyOdd<-function(nPotentialShinyCatched){
   functionName<-match.call()[[1]]
   step<-"Start"
   tryCatch({
+    if(is.nan(nPotentialShinyCatched) || is.na(nPotentialShinyCatched)){
+      return(0)
+    }
   return(round(sum(dbinom(x=1:nPotentialShinyCatched,size=nPotentialShinyCatched,prob=1/450))*100,2))
   }, error = function(err) onError(err,functionName,step ))
 }
