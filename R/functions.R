@@ -180,23 +180,23 @@ cleanPokemonHistory<-function(data){
   data$isShiny<-rep(0,dim(data)[1])
 
   pokemonlist=data[1,];
-  colnames(data)<-c("Ancestor","Scan.date","Nr","Name","Nickname","Gender" ,
-                    "Level"      ,       "possibleLevels"  ,  "CP"            ,    "HP"    ,            "Dust.cost"     ,    "Overall.appraisal"
-                    ,    "ATT.max."   ,       "DEF.max."     ,     "HP.max."     ,      "Stats.appraisal"  , "min.IV."       ,    "mean.IV.",
-                    "max.IV."    ,       "mean.ATT.IV" ,  "mean.DEF.IV",   "mean.HP.IV" ,   "Unique."     ,      "Fast.move"
-                    , "Special.move",          "Sword"   ,          "Shield"   ,         "Eye"    ,           "Star"
-                    ,  "Custom1"       ,    "Custom2"      ,     "Saved"        ,     "Form"        ,      "Egg"        ,       "Lucky"
-  )
+  # colnames(data)<-c("Ancestor","Scan.date","Nr","Name","Nickname","Gender" ,
+  #                   "Level"      ,       "possibleLevels"  ,  "CP"            ,    "HP"    ,            "Dust.cost"     ,    "Overall.appraisal"
+  #                   ,    "ATT.max."   ,       "DEF.max."     ,     "HP.max."     ,      "Stats.appraisal"  , "min.IV."       ,    "mean.IV.",
+  #                   "max.IV."    ,       "mean.ATT.IV" ,  "mean.DEF.IV",   "mean.HP.IV" ,   "Unique."     ,      "Fast.move"
+  #                   , "Special.move",          "Sword"   ,          "Shield"   ,         "Eye"    ,           "Star"
+  #                   ,  "Custom1"       ,    "Custom2"      ,     "Saved"        ,     "Form"        ,      "Egg"        ,       "Lucky"
+  # )
   data$shiny <- pokedex$Shiny[match(data$Nr,pokedex$No)];
 
   #transforme les dates en string
   data$Scan.date<-as.character(data$Scan.date)
-  data$mean.IV.<-as.numeric(as.character(data$mean.IV.))
-  data$mean.ATT.IV<-as.numeric(as.character(data$mean.ATT.IV))
+ # data$mean.IV.<-as.numeric(as.character(data$mean.IV.))
+  #data$mean.ATT.IV<-as.numeric(as.character(data$mean.ATT.IV))
   data$CP<-as.numeric(as.character(data$CP))
-  data$mean.DEF.IV<-as.numeric(as.character(data$mean.DEF.IV))
+  #data$mean.DEF.IV<-as.numeric(as.character(data$mean.DEF.IV))
 
-  data$mean.HP.IV<-as.numeric(as.character(data$mean.HP.IV))
+  #data$mean.HP.IV<-as.numeric(as.character(data$mean.HP.IV))
   data$Level<-as.numeric(as.character(data$Level))
 
   data$scan.day = sapply(data$Scan.date,function(x){
