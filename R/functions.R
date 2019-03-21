@@ -34,7 +34,26 @@ addShinyColumns<-function(data,pokedex){
   sums = sum(dataDay$shiny,na.rm = TRUE);
   return(sums);
   }, error = function(err) onError(err,functionName,step ))
-}
+ }
+
+ #' countFoundShinyByDay
+ #'
+ #' @param data history of catch
+ #' @param day day to count shinys
+ #'
+ #'
+ #' @export
+ #'
+ #'
+ countFoundShinyByDay<-function(data,day){
+   functionName<-match.call()[[1]]
+   step<-"Start"
+   tryCatch({
+     dataDay = data[data$scan.day==day,];
+     sums = sum(dataDay$isShiny,na.rm = TRUE);
+     return(sums);
+   }, error = function(err) onError(err,functionName,step ))
+ }
 
 #' countCapturedByDay
 #'
@@ -94,6 +113,8 @@ summaryByDay<-function(data){
   days =  seq(as.Date(minDay), as.Date(maxDay), by="days")
   sumShiny = numeric(length(days));
   ratioShiny = numeric(length(days));
+  shinyFound = numeric(length(days));
+  nshinyOdd = numeric(length(days));
   captured = numeric(length(days));
   ratio = numeric(length(days));
   shinyodds = numeric(length(days));
@@ -102,9 +123,11 @@ summaryByDay<-function(data){
     captured[i] = countCapturedByDay(data,days[i]);
     ratio[i] = round(sumShiny[i]*100/captured[i],2)
     shinyodds[i] = shinyOdd(sumShiny[i]);
+    shinyFound[i] = countFoundShinyByDay(data,days[i]);
+    nshinyOdd[i] = NshinyOdd(sumShiny[i],shinyFound[i])
   }
 
-  return(data.frame(day=days,captured = captured,nShiny=sumShiny,ratioshiny = ratio,shinyOdd = shinyodds))
+  return(data.frame(day=days,captured = captured,nShiny=sumShiny,ratioshiny = ratio,shinyOdd = shinyodds,shinyFound = shinyFound,nshinyOdd=nshinyOdd))
   }, error = function(err) onError(err,functionName,step ))
 }
 
@@ -339,6 +362,7 @@ shinyOdd<-function(nPotentialShinyCatched){
   step<-"Start"
   tryCatch({
     if(is.nan(nPotentialShinyCatched) | is.na(nPotentialShinyCatched) | nPotentialShinyCatched == 0){
+      print("0 shiny")
       return(0)
     }
 
@@ -346,6 +370,28 @@ shinyOdd<-function(nPotentialShinyCatched){
   }, error = function(err) onError(err,functionName,step ))
 }
 
+#' NshinyOdd
+#'
+#' @param nPotentialShinyCatched  number of shiny captured
+#' @import stats
+#' @export
+
+NshinyOdd<-function(nPotentialShinyCatched,nshiny){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+    if(is.nan(nPotentialShinyCatched) | is.na(nPotentialShinyCatched) | nPotentialShinyCatched == 0){
+      print("0 shiny")
+      return(0)
+    }
+    if(is.nan(nshiny) | is.na(nshiny) | nshiny == 0){
+      print("0 shiny")
+      return(0)
+    }
+
+    return(round(sum(dbinom(x=nshiny:nPotentialShinyCatched,size=nPotentialShinyCatched,prob=1/450))*100,2))
+  }, error = function(err) onError(err,functionName,step ))
+}
 
 #' setIsShiny
 #'
