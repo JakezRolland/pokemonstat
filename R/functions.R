@@ -372,7 +372,9 @@ shinyOdd<-function(nPotentialShinyCatched){
 
 #' NshinyOdd
 #'
+#' @param nshiny number of shiny catched
 #' @param nPotentialShinyCatched  number of shiny captured
+#'
 #' @import stats
 #' @export
 
