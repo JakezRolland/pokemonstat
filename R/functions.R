@@ -261,6 +261,7 @@ updateDatas<-function(){
                            dec = ".", fill = TRUE,encoding="UTF-8")
     print(dim(data_file))
     data_file$Special.move.2<-NULL
+    data_file = cleanPokemonHistory(data_file)
     newdata<-rbind(newdata,data_file)
 
   }
