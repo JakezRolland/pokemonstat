@@ -47,7 +47,7 @@ addCatchDuringCDColumn<-function(data,pokedex){
   functionName<-match.call()[[1]]
   step<-"Start"
   tryCatch({
-    data$shiny<-NULL
+    data$duringCd<-NULL
     duringCd = numeric(dim(data)[1])
     for (row in 1:dim(data)[1]){
       pokemon = data[row,];
@@ -529,7 +529,8 @@ getTotalShinyProbaOutCD<-function(data){
     notshinyPokemons = getPokemonCatchOutCD(data)
     nshiny = sum(notshinyPokemons$isShiny);
     nshinyPossible = sum(notshinyPokemons$shiny);
-  return(nshinyPossible/nshiny)
+    res = EstimaProporExact(nshiny,nshinyPossible,0.05)
+  return(list(estimation = res,nshiny = nshiny,nshinyPossible = nshinyPossible))
 
   }, error = function(err) onError(err,functionName,step ))
 }
@@ -550,6 +551,37 @@ getTotalShinyProbaDuringCD<-function(data){
     nshiny = sum(notshinyPokemons$isShiny);
     nshinyPossible = sum(notshinyPokemons$shiny);
     return(nshinyPossible/nshiny)
+
+  }, error = function(err) onError(err,functionName,step ))
+}
+
+#' getTotalShinyProbaDuringCD
+#'
+#' @param data history of catch
+#'
+#'
+#' @export
+#'
+#'
+getTotalShinyProbaBetweenDates<-function(data,date1,date2){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+    if(date2<date1){
+      datestock = date2;
+      date2<-date1;
+      date1<-datestock
+    }
+    dataFiltered = data[data$scan.day>=date1,]
+    dataFiltered = dataFiltered[dataFiltered$scan.day<=date2,]
+    if(dim(dataFiltered)[1]==0){
+      print("pas de données entre ces ddeux dates")
+      return(0)
+    }
+    res = getTotalShinyProbaOutCD(dataFiltered);
+
+
+    return(res)
 
   }, error = function(err) onError(err,functionName,step ))
 }
@@ -590,3 +622,113 @@ getPokemonCatchDuringCD <- function(data){
 
   }, error = function(err) onError(err,functionName,step ))
 }
+
+#' EstimaProporExact
+#'
+#' @param k nombre reussite
+#' @param n taille echantillon
+#' @param alpha seuil
+
+#' @export
+
+EstimaProporExact=function(k,n,alpha) # appel de la procédure avec le nombre de réussite, la taille de l'échantillon et le seuil de signification de l'intervalle de confiance
+{
+  for(J in 1:2) # boucle qui calcule chacune des bornes de l'intervalle de confiance exact
+  {
+    if(J==1)
+    {
+      p=k/n # initialisation du paramètre p pour le calcul de la borne gauche
+      p0=0 # initialisation d'une première variable auxiliaire pour le calcul de la borne gauche
+      p1=0 # initialisation d'une seconde variable auxiliaire pour le calcul de la borne gauche
+    }
+    else
+    {
+      p=k/n # initialisation du paramètre p pour le calcul de la borne droite
+      p0=1	# initialisation d'une première variable auxiliaire pour le calcul de la borne droite
+      p1=1	# initialisation d'une deuxième variable auxiliaire pour le calcul de la borne droite
+    }
+    while(abs(p-p0)>0.0001)		# boucle calculant la borne correspondante avec une précision de 0,0001
+    {
+      Proba=1	# initialisation de la variable qui contiendra la probabilité de l'intervalle de confiance
+      k1=0 # initialisation de la borne inférieure de l'intervalle - modalité à gauche
+      k2=n # initialisation de la borne supérieure de l'intervalle - modalité à droite
+      Arret=FALSE	# indicateur de fin de boucle pour l'intervalle de prédiction
+      while(Arret==FALSE) # calul de l'intervalle de prédiction avec le p actuel
+      {
+        Pr1=dbinom(k1,n,p) # probabilité de la modalité à gauche
+        Pr2=dbinom(k2,n,p) # probabilité de la modalité à droite
+        if (Pr1>=Pr2) # comparaison des probabilités
+        { # celle de la modalité à droite est la plus petite
+          I=2	# indicatrice de cette modalité
+          Proba=Proba-Pr2	# la probabilité de l'intervalle est diminué de la plus petite des deux probabilités
+        }
+        else
+        { # celle de la modalité à gauche est la plus petite
+          I=1	# indicatrice de cette modalité
+          Proba=Proba-Pr1	# la probabilité de l'intervalle est diminué de la plus petite des deux probabilités
+        }
+        if (Proba>1-alpha)
+        { # le seuil de confiance n'est pas atteint
+          if (I==1)
+          { # la dernière probabilité retranchée est celle de la modalité à gauche
+            k1=k1+1	# changement de cette modalité à gauche
+          }
+          else
+          { # la dernière probabilité retranchée est celle de la modalité à droite
+            k2=k2-1	# changement de cette modalité à droite
+          }
+        }
+        else
+        { # le seuil de confiance est atteint et l'intervalle de prédiction calculé [k1;k2]
+          Arret=TRUE
+        }
+      }
+      if(J==1) # test determinant quelle borne de l'intervalle de confiance est calculé
+      {
+        if(k<=k2) # boucle pour la détemination de la borne droite de l'intervalle de confiance
+        {
+          Passage=TRUE
+        }
+        else
+        {
+          Passage=FALSE
+        }
+      }
+      else
+      {
+        if(k1<=k) # boucle pour la détemination de la borne gauche de l'intervalle de confiance
+        {
+          Passage=TRUE
+        }
+        else
+        {
+          Passage=FALSE
+        }
+      }
+      if (Passage==TRUE) # si le nombre de réussite est inférieur à la borne droite
+      {
+        p1=p # garder la valeur de p dans p1
+      }
+      else # sinon
+      {
+        p0=p # garder la valeur de p dans p0
+        p=p1 # la nouvelle valeur de p est la dernière valeur de p1 (celle pour laquelle le nombre de réussite est dans l'intervalle)
+      }
+      p=(p+p0)/2 # nouvelle valeur de p (valeur comprise entre la valeur de p0 et l'ancienne valeur de p)
+    } # fin de la boucle calculant la borne correspondante
+    if(J==1)
+    {
+      pinf=p1	# borne gauche de l'intervalle
+    }
+    else
+    {
+      psup=p1	# borne droite de l'intervalle
+    }
+  }
+  return(list(estim = k/n,inf = pinf,sup=psup,exceptional = (1/450>psup|1/450<pinf),inf = 1/pinf,sup = 1/psup))
+  options(digits=4) # format d'affichage des nombres
+  cat("Estimation ponctuelle de la proportion théorique :",k/n,"\n") # affichage des résultats
+  cat("Intervalle de confiance de la proportion théorique au seuil de ",100* alpha," %  :\n")
+  cat("[ ",pinf," ; ",psup," ]\n")
+}
+
