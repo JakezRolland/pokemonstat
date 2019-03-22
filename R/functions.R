@@ -12,11 +12,61 @@ addShinyColumns<-function(data,pokedex){
   functionName<-match.call()[[1]]
   step<-"Start"
   tryCatch({
-  data$shiny = pokedex$Shiny[data$Nr];
+    data$shiny<-NULL
+  shiny = numeric(dim(data)[1])
+    for (row in 1:dim(data)[1]){
+      pokemon = data[row,];
+      nr = pokemon$Nr;
+      pokemonpokedex = pokedex[match(nr,pokedex$No),]
+      date = pokemon$scan.day
+      if(as.character(pokemonpokedex$Start)!=""){
+        isshiny = (as.Date(pokemonpokedex$Start)<=date)&pokemonpokedex$Shiny
+      }
+      else {
+        isshiny = pokemonpokedex$Shiny
+      }
+
+      shiny[row]=as.numeric(isshiny)
+    }
+  data$shiny = shiny
   return(data)
   }, error = function(err) onError(err,functionName,step ))
 }
 
+
+#' addCatchDuringCDColumn
+#'
+#' @param data history of catches
+#' @param pokedex pokedex
+#'
+#'
+#' @export
+#'
+#'
+addCatchDuringCDColumn<-function(data,pokedex){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+    data$shiny<-NULL
+    duringCd = numeric(dim(data)[1])
+    for (row in 1:dim(data)[1]){
+      pokemon = data[row,];
+      nr = pokemon$Nr;
+      pokemonpokedex = pokedex[match(nr,pokedex$No),]
+      date = pokemon$scan.day
+      if(as.character(pokemonpokedex$cd)!=""){
+        duringcd = (as.Date(pokemonpokedex$cd)==date)
+      }
+      else {
+        duringcd = FALSE
+      }
+
+      duringCd[row]=as.numeric(duringcd)
+    }
+    data$duringCd = duringCd
+    return(data)
+  }, error = function(err) onError(err,functionName,step ))
+}
 #' countShinyByDay
 #'
 #' @param data history of catch
@@ -311,11 +361,25 @@ getPokedex <- function(){
   #pokedex <- read.csv2("~/Documents/pokedex.csv", header = TRUE, sep = ";", quote = "\"",
   # dec = ".", fill = TRUE,encoding="UTF-8")
   pokedex <- read.csv2("pokedex.csv", header = TRUE, sep = ";", quote = "\"",dec = ".", fill = TRUE,encoding="UTF-8")
+
   return(pokedex);
 
   }, error = function(err) onError(err,functionName,step ))
 }
 
+#' getCDInfos
+#' @export
+#' @import utils
+getCDInfos <- function(){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+    cdinfo <- read.csv2("community_day_info.csv", header = TRUE, sep = ";", quote = "\"",dec = ".", fill = TRUE,encoding="UTF-8")
+
+    return(cdinfo);
+
+  }, error = function(err) onError(err,functionName,step ))
+}
 
 
 
@@ -449,3 +513,81 @@ saveHistory<-function(data){
   }, error = function(err) onError(err,functionName,step ))
 }
 
+
+
+#' getTotalShinyProbaOutCD
+#'
+#' @param data history of catch
+#'
+#'
+#' @export
+#'
+#'
+getTotalShinyProbaOutCD<-function(data){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+    notshinyPokemons = getPokemonCatchOutCD(data)
+    nshiny = sum(notshinyPokemons$isShiny);
+    nshinyPossible = sum(notshinyPokemons$shiny);
+  return(nshinyPossible/nshiny)
+
+  }, error = function(err) onError(err,functionName,step ))
+}
+
+#' getTotalShinyProbaDuringCD
+#'
+#' @param data history of catch
+#'
+#'
+#' @export
+#'
+#'
+getTotalShinyProbaDuringCD<-function(data){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+    notshinyPokemons = getPokemonCatchDuringCD(data)
+    nshiny = sum(notshinyPokemons$isShiny);
+    nshinyPossible = sum(notshinyPokemons$shiny);
+    return(nshinyPossible/nshiny)
+
+  }, error = function(err) onError(err,functionName,step ))
+}
+
+#' getPokemonCatchOutCD
+#'
+#' @param data of catch
+#'
+#'
+#' @export
+#'
+#'
+getPokemonCatchOutCD <- function(data){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+
+    return(data[data$duringCd==0,])
+
+  }, error = function(err) onError(err,functionName,step ))
+}
+
+
+#' getPokemonCatchDuringCD
+#'
+#' @param data of catch
+#'
+#'
+#' @export
+#'
+#'
+getPokemonCatchDuringCD <- function(data){
+  functionName<-match.call()[[1]]
+  step<-"Start"
+  tryCatch({
+
+    return(data[data$duringCd==1,])
+
+  }, error = function(err) onError(err,functionName,step ))
+}
