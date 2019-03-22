@@ -260,8 +260,8 @@ cleanPokemonHistory<-function(data){
   #                   , "Special.move",          "Sword"   ,          "Shield"   ,         "Eye"    ,           "Star"
   #                   ,  "Custom1"       ,    "Custom2"      ,     "Saved"        ,     "Form"        ,      "Egg"        ,       "Lucky"
   # )
-  data$shiny <- pokedex$Shiny[match(data$Nr,pokedex$No)];
-
+  data=addShinyColumns(data,pokedex)
+  data=addCatchDuringCDColumn(data,pokedex)
   #transforme les dates en string
   data$Scan.date<-as.character(data$Scan.date)
  # data$mean.IV.<-as.numeric(as.character(data$mean.IV.))
