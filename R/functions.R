@@ -725,7 +725,7 @@ EstimaProporExact=function(k,n,alpha) # appel de la procédure avec le nombre de
       psup=p1	# borne droite de l'intervalle
     }
   }
-  return(list(estim = k/n,inf = pinf,sup=psup,exceptional = (1/450>psup|1/450<pinf),inf = 1/pinf,sup = 1/psup, value = k/n))
+  return(list(estim = k/n,inf = pinf,sup=psup,exceptional = (1/450>psup|1/450<pinf),inf = 1/pinf,sup = 1/psup, value = n/k))
   options(digits=4) # format d'affichage des nombres
   cat("Estimation ponctuelle de la proportion théorique :",k/n,"\n") # affichage des résultats
   cat("Intervalle de confiance de la proportion théorique au seuil de ",100* alpha," %  :\n")
