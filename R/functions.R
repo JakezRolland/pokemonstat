@@ -251,7 +251,6 @@ cleanPokemonHistory<-function(data){
 
   data$isShinyCD<-rep(0,dim(data)[1])
   data$isShiny<-rep(0,dim(data)[1])
-
   pokemonlist=data[1,];
   # colnames(data)<-c("Ancestor","Scan.date","Nr","Name","Nickname","Gender" ,
   #                   "Level"      ,       "possibleLevels"  ,  "CP"            ,    "HP"    ,            "Dust.cost"     ,    "Overall.appraisal"
@@ -260,8 +259,7 @@ cleanPokemonHistory<-function(data){
   #                   , "Special.move",          "Sword"   ,          "Shield"   ,         "Eye"    ,           "Star"
   #                   ,  "Custom1"       ,    "Custom2"      ,     "Saved"        ,     "Form"        ,      "Egg"        ,       "Lucky"
   # )
-  data=addShinyColumns(data,pokedex)
-  data=addCatchDuringCDColumn(data,pokedex)
+
   #transforme les dates en string
   data$Scan.date<-as.character(data$Scan.date)
  # data$mean.IV.<-as.numeric(as.character(data$mean.IV.))
@@ -284,7 +282,8 @@ cleanPokemonHistory<-function(data){
     return(strsplit(x,split=' ')[[1]][2])}
     ,USE.NAMES = FALSE)
 
-
+  data=addShinyColumns(data,pokedex)
+  data=addCatchDuringCDColumn(data,pokedex)
   return(data);
   }, error = function(err) onError(err,functionName,step ))
 }
