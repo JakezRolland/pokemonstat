@@ -337,6 +337,7 @@ updateDatas<-function(){
     newdata<-rbind(newdata,data_file)
 
   }
+  names(newdata ) = names(data)
   if(dim(newdata)[1]>0){
     data = rbind(data,newdata)
   }
