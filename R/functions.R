@@ -281,9 +281,9 @@ cleanPokemonHistory<-function(data){
   data$scan.hour = sapply(data$Scan.date,function(x){
     return(strsplit(x,split=' ')[[1]][2])}
     ,USE.NAMES = FALSE)
-
-  data=addShinyColumns(data,pokedex)
   data=addCatchDuringCDColumn(data,pokedex)
+  data=addShinyColumns(data,pokedex)
+
   return(data);
   }, error = function(err) onError(err,functionName,step ))
 }
