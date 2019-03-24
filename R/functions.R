@@ -427,7 +427,6 @@ shinyOdd<-function(nPotentialShinyCatched){
   step<-"Start"
   tryCatch({
     if(is.nan(nPotentialShinyCatched) | is.na(nPotentialShinyCatched) | nPotentialShinyCatched == 0){
-      print("0 shiny")
       return(0)
     }
 
@@ -448,11 +447,9 @@ NshinyOdd<-function(nPotentialShinyCatched,nshiny){
   step<-"Start"
   tryCatch({
     if(is.nan(nPotentialShinyCatched) | is.na(nPotentialShinyCatched) | nPotentialShinyCatched == 0){
-      print("0 shiny")
       return(0)
     }
     if(is.nan(nshiny) | is.na(nshiny) | nshiny == 0){
-      print("0 shiny")
       return(0)
     }
 
