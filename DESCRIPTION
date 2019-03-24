@@ -12,4 +12,5 @@ Imports:
     ggplot2,
     utils,
     devtools,
-    withr
+    withr,
+    rlist
