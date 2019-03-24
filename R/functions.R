@@ -516,7 +516,7 @@ saveHistory<-function(data){
 #' getTotalShinyProbaOutCD
 #'
 #' @param data history of catch
-#'
+#' @importFrom rlist list.append
 #'
 #' @export
 #'
@@ -526,10 +526,11 @@ getTotalShinyProbaOutCD<-function(data){
   step<-"Start"
   tryCatch({
     notshinyPokemons = getPokemonCatchOutCD(data)
+
     nshiny = sum(notshinyPokemons$isShiny);
     nshinyPossible = sum(notshinyPokemons$shiny);
     res = EstimaProporExact(nshiny,nshinyPossible,0.05)
-  return(list(estimation = res,nshiny = nshiny,nshinyPossible = nshinyPossible))
+  return(list.append(res,nshiny = nshiny,nshinyPossible = nshinyPossible))
 
   }, error = function(err) onError(err,functionName,step ))
 }
@@ -549,7 +550,8 @@ getTotalShinyProbaDuringCD<-function(data){
     notshinyPokemons = getPokemonCatchDuringCD(data)
     nshiny = sum(notshinyPokemons$isShiny);
     nshinyPossible = sum(notshinyPokemons$shiny);
-    return(nshinyPossible/nshiny)
+    res = EstimaProporExact(nshiny,nshinyPossible,0.05)
+    return(list.append(res,nshinyCD = nshiny,nshinyCDPossible = nshinyPossible))
 
   }, error = function(err) onError(err,functionName,step ))
 }
@@ -562,7 +564,7 @@ getTotalShinyProbaDuringCD<-function(data){
 #' @export
 #'
 #'
-getTotalShinyProbaBetweenDates<-function(data,date1,date2){
+getStatBetweenDates<-function(data,date1,date2){
   functionName<-match.call()[[1]]
   step<-"Start"
   tryCatch({
@@ -574,12 +576,12 @@ getTotalShinyProbaBetweenDates<-function(data,date1,date2){
     dataFiltered = data[data$scan.day>=date1,]
     dataFiltered = dataFiltered[dataFiltered$scan.day<=date2,]
     if(dim(dataFiltered)[1]==0){
-      print("pas de données entre ces ddeux dates")
+      print("pas de données entre ces deux dates")
       return(0)
     }
     res = getTotalShinyProbaOutCD(dataFiltered);
-
-
+    totalCatch = dim(dataFiltered)[1]
+    res=list.append(res,totalCatch)
     return(res)
 
   }, error = function(err) onError(err,functionName,step ))
